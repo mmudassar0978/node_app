@@ -47,6 +47,7 @@ pipeline {
         stage('Deployed') {
             steps {
                 sh '''
+                    export "KUBECONFIG=$HOME/.kube/config"
                     kubectl apply -f deployment/ns.yml
                     kubectl apply -f deployment/deployment.yml
                     kubectl apply -f deployment/service.yml
