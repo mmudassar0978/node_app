@@ -1,0 +1,20 @@
+apiversion: apps/v1
+kind: Deployment
+metadata:
+  name: node-app
+  selector:
+    matchLabels:
+      app: node-app
+
+spec:
+  replicas: 2
+  template:
+    metadata:
+      Labels:
+        app: node-app
+    spec:
+      containers:
+        - name: node-app
+          image: mudassar9530/node-app:latest
+          ports:
+            - containerPort: 8085

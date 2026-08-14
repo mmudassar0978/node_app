@@ -1,12 +1,10 @@
 pipeline {
-    agent {
-        label 'ubuntu'
-    }
+    agent any
 
     environment {
-        IMAGE_NAME = "mudassar9530/html_home_page"
+        IMAGE_NAME = "mudassar9530/node-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        CONTAINER_NAME = "html_home_page"
+        CONTAINER_NAME = "node-app"
     }
 
     stages {
@@ -49,16 +47,16 @@ pipeline {
         stage('Deployed') {
             steps {
                 sh '''
-                    docker pull $IMAGE_NAME:latest
+                    kubectl apply -f deployment/ns.yml
+                    kubectl apply -f deployment/deployment.yml
+                    kubectl apply -f deployment/service.yml
 
-                    docker stop $CONTAINER_NAME || true
-                    docker rm $CONTAINER_NAME || true
-
-                    docker run -d --name $CONTAINER_NAME -p 8081:80 --restart unless-stopped $IMAGE_NAME:latest
+                    
                 '''
             }
         }
     }
+    
 
     post {
         success {
