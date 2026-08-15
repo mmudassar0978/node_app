@@ -54,6 +54,7 @@ pipeline {
                 )]) {
 
                     sh '''
+                        git pull origin main --rebase
                         sed -i "s|image: mudassar9530/node-app:.*|image: mudassar9530/node-app:$IMAGE_TAG|" deployment/deploy.yml
 
                         git config user.name "Jenkins"
@@ -64,6 +65,7 @@ pipeline {
                         git diff --cached --quiet || \
                         git commit -m "Update node-app image to $IMAGE_TAG"
 
+                        
                         git push https://$GIT_USER:$GIT_TOKEN@github.com/mmudassar0978/node_app.git HEAD:main
                     '''
                 }
