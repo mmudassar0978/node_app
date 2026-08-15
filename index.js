@@ -165,7 +165,7 @@ const html = `
 
     <section class="hero">
 
-        <h1>Welcome to My DevOps Journey!</h1>
+        <h1>Welcome to My DevOps Journey from scratch!</h1>
 
         <p>
             This is a simple Node.js application where
