@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: node-app
-          image: mudassar9530/node-app:15
+          image: mudassar9530/node-app:17
           ports:
             - containerPort: 8085
