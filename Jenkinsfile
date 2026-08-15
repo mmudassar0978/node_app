@@ -47,16 +47,26 @@ pipeline {
 
         stage('Update Kubernetes Manifest') {
             steps {
-                sh '''
-                    sed -i "s|image: mudassar9530/node-app:.*|image: mudassar9530/node-app:$IMAGE_TAG|" deployment/deploy.yml
+                withCredentials([usernamePassword(
+                    credentialsId: 'github_cred',
+                    usernameVariable: 'GIT_USER',
+                    passwordVariable: 'GIT_TOKEN'
+                )]) {
 
-                    git config user.name "Jenkins"
-                    git config user.email "jenkins@example.com"
+                    sh '''
+                        sed -i "s|image: mudassar9530/node-app:.*|image: mudassar9530/node-app:$IMAGE_TAG|" deployment/deploy.yml
 
-                    git add deployment/deploy.yml
-                    git diff --cached --quiet || git commit -m "Update node-app image to $IMAGE_TAG"
-                    git push origin HEAD:main
-                '''
+                        git config user.name "Jenkins"
+                        git config user.email "jenkins@example.com"
+
+                        git add deployment/deploy.yml
+
+                        git diff --cached --quiet || \
+                        git commit -m "Update node-app image to $IMAGE_TAG"
+
+                        git push https://$GIT_USER:$GIT_TOKEN@github.com/mmudassar0978/node_app.git HEAD:main
+                    '''
+                }
             }
         }
     }
