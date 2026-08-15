@@ -4,7 +4,6 @@ pipeline {
     environment {
         IMAGE_NAME = "mudassar9530/node-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
-        CONTAINER_NAME = "node-app"
     }
 
     stages {
@@ -33,7 +32,9 @@ pipeline {
                 )]) {
 
                     sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        echo "$DOCKER_PASS" | docker login \
+                            -u "$DOCKER_USER" \
+                            --password-stdin
 
                         docker push $IMAGE_NAME:$IMAGE_TAG
                         docker push $IMAGE_NAME:latest
@@ -44,27 +45,29 @@ pipeline {
             }
         }
 
-        stage('Deployed') {
+        stage('Update Kubernetes Manifest') {
             steps {
                 sh '''
-                    export "KUBECONFIG=$HOME/.kube/config"
-                    kubectl apply -f deployment/ns.yml 
-                    kubectl apply -f deployment/deploy.yml -n node-app
-                    kubectl apply -f deployment/service.yml -n node-app
+                    sed -i "s|image: mudassar9530/node-app:.*|image: mudassar9530/node-app:$IMAGE_TAG|" deployment/deploy.yml
 
-                    
+                    git config user.name "Jenkins"
+                    git config user.email "jenkins@example.com"
+
+                    git add deployment/deploy.yml
+                    git diff --cached --quiet || git commit -m "Update node-app image to $IMAGE_TAG"
+                    git push origin HEAD:main
                 '''
             }
         }
     }
-    
 
     post {
         success {
-            echo 'Application deployed successfully!'
+            echo 'Docker image pushed and Git manifest updated successfully!'
         }
+
         failure {
-            echo 'Deployment failed.'
+            echo 'Pipeline failed.'
         }
     }
 }
